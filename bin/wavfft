@@ -1,0 +1,161 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+#
+# Spectrum analyzer for WAV file
+#
+#   Copyright (C) 2019 Hiroshi Kuwagata <kgt9221@gmail.com>
+#
+
+require 'optparse'
+require 'pathname'
+require 'pp'
+
+#
+# パッケージ内で参照する定数の定義
+#
+
+TRADITIONAL_NAME = "Spectrum analyzer for WAV file"
+APP_NAME         = "wavfft"
+
+BASE_DIR         = Pathname.new(File.expand_path(__FILE__)).dirname.parent
+LIB_DIR          = BASE_DIR + "lib"
+PKG_LIB_DIR      = LIB_DIR + "wavspa"
+APP_LIB_DIR      = PKG_LIB_DIR + APP_NAME
+
+#
+# ライブラリロードパスの差し込み
+#
+
+$LOAD_PATH.unshift(LIB_DIR)
+
+#
+# アプリケーション本体の読み込み
+#
+
+require "#{PKG_LIB_DIR + "version"}"
+require "#{PKG_LIB_DIR + "common"}"
+require "#{APP_LIB_DIR + "preset"}"
+require "#{APP_LIB_DIR + "main"}"
+
+#
+# デフォルトパラメータのセット
+#
+
+include WavSpectrumAnalyzer
+
+params = FFTApp::PRESET_TABLE["default"]
+output = nil
+
+#
+# コマンドラインオプションのパース
+#
+
+OptionParser.new {|opt|
+  window_funcs = %w{
+    RECTANGULAR HAMMING HANN BLACKMAN BLACKMAN_NUTTALL FLAT_TOP
+  }
+
+  opt.version = VERSION
+
+  opt.on("-o", "--output=FILE", String) { |name|
+    output = name
+  }
+
+  opt.on("-p", "--preset=NAME", String) { |name|
+    name.downcase!
+
+    if name == "help"
+      FFTApp::PRESET_TABLE.keys.each { |str|
+        printf("    %s\n", str)
+      }
+      exit
+    end
+
+    if FFTApp::PRESET_TABLE.include?(name)
+      params = FFTApp::PRESET_TABLE[name]
+    else
+      raise("Unknown preset name.")
+    end
+  }
+
+  opt.on("-f", "--fft-size=SIZE", Integer) {|val|
+    params[:fft_size] = val
+  }
+
+  opt.on("-u", "--unit-time=MSEC", Integer) {|val|
+    params[:unit_time] = val
+  }
+
+  opt.on("-W", "--output-width=SIZE", Integer) {|val|
+    params[:output_width] = val
+  }
+
+  opt.on("-w", "--window-function=FUNCTION", String) {|name|
+    name.upcase!
+
+    if name == "HELP"
+      window_funcs.each {|func| printf("    %s\n", func)}
+      exit
+    end
+
+    if window_funcs.include?(name)
+      params[:window_function] = name
+    else
+      raise("Unknown windows function.")
+    end
+  }
+
+  opt.on("-c", "--col-steps=SIZE", Integer) {|val|
+    params[:col_step] = val
+  }
+
+  opt.on("-r", "--frquency-range=LOW-SIDE,HIGH-SIDE", Array) { |val|
+    params[:range] = [val[0].to_f, val[1].to_f]
+  }
+
+  opt.on("-m", "--scale-mode=MODE", String) { |val|
+    name = name.upcase.to_sym
+    raise("unknown scale mode.") if not ["LINEAR", "LOGSCALE"].include?(name)
+
+    params[:scale_mode] = name
+  }
+
+  opt.on("--show-params") {
+    printf("FFT size        %20d entries\n", params[:fft_size])
+    printf("unit time       %20d msec\n", params[:unit_time])
+    printf("window function %20s\n", params[:window_function].to_s)
+    printf("scale mode      %20s\n", params[:scale_mode].to_s)
+    printf("frequency range %20s Hz\n",
+                  ("%.0f - %.0f" % [params[:range][0], params[:range][1]]))
+    printf("column steps    %20d pixels\n", params[:col_step])
+    exit
+  }
+
+  opt.on("-F", "--draw-freq-line") {
+    $draw_freq_line = true
+  }
+
+  opt.on("-T", "--draw-time-line") {
+    $draw_time_line = true
+  }
+
+  opt.on('-v', "--verbose") {
+    $verbose = true
+  }
+
+  opt.parse!(ARGV)
+
+  if ARGV.empty?
+    STDERR.print("target file not specified.\n")
+    exit(1)
+  end
+
+  output ||= File.basename(ARGV[0], ".wav") + ".png"
+}
+
+#
+# アプリケーションの起動
+#
+
+FFTApp.main(ARGV[0], params, output)
