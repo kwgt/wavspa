@@ -52,6 +52,7 @@ output = nil
 #
 
 OptionParser.new {|opt|
+  opt.banner += " WAV-FILE"
   opt.version = VERSION
 
   opt.on("-o", "--output=FILE", String) { |name|
@@ -71,7 +72,8 @@ OptionParser.new {|opt|
     if WaveLetApp::PRESET_TABLE.include?(name)
       params = WaveLetApp::PRESET_TABLE[name]
     else
-      raise("Unknown preset name.")
+      STDERR.print("error: unknown preset name.\n")
+      exit(1)
     end
   }
 
@@ -87,27 +89,34 @@ OptionParser.new {|opt|
     params[:unit_time] = val * 10
   }
 
-  opt.on("-m", "--scale-mode=STRING", String) {|name|
-    name = name.upcase.to_sym
-    raise("unknown scale mode.") if not ["LINEAR", "LOGSCALE"].include?(name)
-
-    params[:scale_mode] = name
-  }
-
   opt.on("-W", "--output-width=SIZE", Integer) {|val|
     params[:output_width] = val
   }
 
-  opt.on("-r", "--frquency-range=LOW-SIDE,HIGH-SIDE", Array) { |val|
+  opt.on("-r", "--frequency-range=LO,HI", Array) { |val|
     params[:range] = [val[0].to_f, val[1].to_f]
+  }
+
+  opt.on("--floor-gain=DB", Float) {|val|
+    params[:floor] = val
   }
 
   opt.on("--ceil-gain=DB", Float) {|val|
     params[:ceil] = val
   }
 
-  opt.on("--floor-gain=DB", Float) {|val|
-    params[:floor] = val
+  opt.on("-m", "--scale-mode=STRING", String) {|name|
+    name = name.upcase.to_sym
+    if not ["LINEAR", "LOGSCALE"].include?(name)
+      STDERR.print("error: unknown scale mode.\n")
+      exit(1)
+    end
+
+    params[:scale_mode] = name
+  }
+
+  opt.on("-c", "--col-steps=SIZE", Integer) {|val|
+    params[:col_step] = val
   }
 
   opt.on("--show-params") {
@@ -137,7 +146,7 @@ OptionParser.new {|opt|
   opt.parse!(ARGV)
 
   if ARGV.empty?
-    STDERR.print("target file not specified.\n")
+    STDERR.print("error: target file not specified.\n")
     exit(1)
   end
 

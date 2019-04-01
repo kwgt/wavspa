@@ -23,14 +23,14 @@ module WavSpectrumAnalyzer
       },
 
       "cd" => {
-        :sigma           => 16.0,
+        :sigma           => 24.0,
         :unit_time       => 5 * 10,
         :scale_mode      => :LOGSCALE,
         :transform_mode  => :POWER,
         :output_width    => 480,
         :range           => [50.0, 22050.0],
         :ceil            => -10,
-        :floor           => -120,
+        :floor           => -90,
         :col_step        => 1,
       },
     }

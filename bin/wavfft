@@ -56,6 +56,7 @@ OptionParser.new {|opt|
     RECTANGULAR HAMMING HANN BLACKMAN BLACKMAN_NUTTALL FLAT_TOP
   }
 
+  opt.banner += " WAV-FILE"
   opt.version = VERSION
 
   opt.on("-o", "--output=FILE", String) { |name|
@@ -75,7 +76,8 @@ OptionParser.new {|opt|
     if FFTApp::PRESET_TABLE.include?(name)
       params = FFTApp::PRESET_TABLE[name]
     else
-      raise("Unknown preset name.")
+      STDERR.print("error: unknown preset name.\n")
+      exit(1)
     end
   }
 
@@ -102,23 +104,27 @@ OptionParser.new {|opt|
     if window_funcs.include?(name)
       params[:window_function] = name
     else
-      raise("Unknown windows function.")
+      STDERR.print("unknown windows function.\n")
+      exit(1)
     end
   }
 
-  opt.on("-c", "--col-steps=SIZE", Integer) {|val|
-    params[:col_step] = val
-  }
-
-  opt.on("-r", "--frquency-range=LOW-SIDE,HIGH-SIDE", Array) { |val|
+  opt.on("-r", "--frequency-range=LO,HI", Array) { |val|
     params[:range] = [val[0].to_f, val[1].to_f]
   }
 
   opt.on("-m", "--scale-mode=MODE", String) { |val|
     name = name.upcase.to_sym
-    raise("unknown scale mode.") if not ["LINEAR", "LOGSCALE"].include?(name)
+    if not ["LINEAR", "LOGSCALE"].include?(name)
+      STDERR.print("error: unknown scale mode.\n")
+      exit(1)
+    end
 
     params[:scale_mode] = name
+  }
+
+  opt.on("-c", "--col-steps=SIZE", Integer) {|val|
+    params[:col_step] = val
   }
 
   opt.on("--show-params") {
@@ -147,7 +153,7 @@ OptionParser.new {|opt|
   opt.parse!(ARGV)
 
   if ARGV.empty?
-    STDERR.print("target file not specified.\n")
+    STDERR.print("error: target file not specified.\n")
     exit(1)
   end
 

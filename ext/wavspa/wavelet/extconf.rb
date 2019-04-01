@@ -23,14 +23,11 @@ if omp_path
   $LDFLAGS << " -L#{omp_path}"
 
   case RbConfig::CONFIG['arch']
-  when /-linux/
-    # nothing
-
   when /-darwin/
     $LDFLAGS << " -Wl,-rpath,#{omp_path}"
 
   else
-    raise("unsupported environment")
+    # nothing
   end
 end
 

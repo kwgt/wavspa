@@ -91,6 +91,12 @@ module WavSpectrumAnalyzer
 
           EOT
         end
+
+        if wav.channel_num >= 2
+          STDERR.print("error: multi chanel data is not supported " \
+                       "(support only monoral data).\n")
+          exit(1)
+        end
        
         until rows >= nblk
           STDERR.printf("\rtransform #{rows + 1}/#{nblk}", rows) if $verbose
