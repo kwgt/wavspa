@@ -76,8 +76,7 @@ OptionParser.new {|opt|
     if FFTApp::PRESET_TABLE.include?(name)
       params = FFTApp::PRESET_TABLE[name]
     else
-      STDERR.print("error: unknown preset name.\n")
-      exit(1)
+      error("unknown preset name.\n")
     end
   }
 
@@ -104,8 +103,7 @@ OptionParser.new {|opt|
     if window_funcs.include?(name)
       params[:window_function] = name
     else
-      STDERR.print("unknown windows function.\n")
-      exit(1)
+      error("unknown windows function.")
     end
   }
 
@@ -113,11 +111,15 @@ OptionParser.new {|opt|
     params[:range] = [val[0].to_f, val[1].to_f]
   }
 
+  opt.on("-g", "--frequency-grid=BASIS,STEP", Array) { |val|
+    params[:basis_freq] = val[0].to_f
+    params[:grid_step]  = val[1].to_f
+  }
+
   opt.on("-m", "--scale-mode=MODE", String) { |name|
     name = name.upcase.to_sym
     if not [:LINEARSCALE, :LOGSCALE].include?(name)
-      STDERR.print("error: unknown scale mode.\n")
-      exit(1)
+      error("unknown scale mode.")
     end
 
     params[:scale_mode] = name
@@ -152,9 +154,19 @@ OptionParser.new {|opt|
 
   opt.parse!(ARGV)
 
+  if params[:scale_mode] == :LOGSCALE
+    if params[:basis_freq] <= 1.0 || params[:grid_step] <= 1.0
+      error("illeagal frequency grid.")
+    end
+
+  else
+    if params[:basis_freq] <= 0.0 || params[:grid_step] <= 0.0
+      error("illeagal frequency grid.")
+    end
+  end
+
   if ARGV.empty?
-    STDERR.print("error: target file not specified.\n")
-    exit(1)
+    error("target file not specified.")
   end
 
   output ||= File.basename(ARGV[0], ".wav") + ".png"

@@ -22,19 +22,22 @@ module WavSpectrumAnalyzer
         @unit_time    = param[:unit_time]
         @fft_size     = param[:fft_size]
         @output_width = param[:output_width]
-        @logscale     = (param[:scale_mode] == :LOGSCALE)
         @win_func     = param[:window_function]
-        @scale_mode   = param[:scale_mode]
-        @col_step     = param[:col_step]
 
         @freq_range   = param[:range]
+        @scale_mode   = param[:scale_mode]
+        @logscale     = (param[:scale_mode] == :LOGSCALE)
+        @col_step     = param[:col_step]
+
+        @basis_freq   = param[:basis_freq] || 440.0 
+        @grid_step    = param[:grid_step] || ((@logscale)? 2.0: 2000.0)
+
         @lo_freq      = @freq_range[0]
         @hi_freq      = @freq_range[1]
         @freq_width   = (@hi_freq - @lo_freq)
 
         @log_step     = (@hi_freq / @lo_freq) ** (1.0 / @output_width)
         @log_base     = Math.log(@log_step)
-        @basis_freq   = 440.0
       end
       private :load_param
 

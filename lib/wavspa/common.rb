@@ -15,17 +15,25 @@ module WavSpectrumAnalyzer
       return (scale * @output_width).round
     end
 
+    def up_step(freq)
+      return (@logscale)? (freq * @grid_step): (freq + @grid_step)
+    end
+
+    def down_step(freq)
+      return (@logscale)? (freq / @grid_step): (freq - @grid_step)
+    end
+
     def draw_freq_line(fb)
       #
       # 低周波方向
       #
-      frq = @basis_freq / 2
+      frq = down_step(@basis_freq)
       loop {
         pos  = fpos(frq)
         break if pos >= @output_width
 
         fb.hline(pos, "#{frq.to_i}Hz")
-        frq /= 2
+        frq = down_step(frq)
       }
      
       #
@@ -37,7 +45,7 @@ module WavSpectrumAnalyzer
         break if pos <= 0 
 
         fb.hline(pos, "#{frq.to_i}Hz")
-        frq *= 2
+        frq = up_step(frq)
       }
     end
 
@@ -69,6 +77,11 @@ module WavSpectrumAnalyzer
           fb.vline(col, time_str(tm)) if (tm % 10).zero?
         end
       }
+    end
+
+    def error(msg)
+      STDERR.printf("error: %s\n")
+      exit(1)
     end
   end
 end

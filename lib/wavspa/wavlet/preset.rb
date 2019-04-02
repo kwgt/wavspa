@@ -17,8 +17,8 @@ module WavSpectrumAnalyzer
         :transform_mode  => :POWER,
         :output_width    => 240,
         :range           => [200.0, 8000.0],
-        :ceil            => -10,
-        :floor           => -90,
+        :ceil            => -10.0,
+        :floor           => -90.0,
         :col_step        => 1,
       },
 
@@ -29,8 +29,8 @@ module WavSpectrumAnalyzer
         :transform_mode  => :POWER,
         :output_width    => 480,
         :range           => [50.0, 22050.0],
-        :ceil            => -10,
-        :floor           => -90,
+        :ceil            => -10.0,
+        :floor           => -90.0,
         :col_step        => 1,
       },
     }

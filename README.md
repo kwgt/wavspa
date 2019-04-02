@@ -36,7 +36,8 @@ options:
     -u, --unit-time=CS
     -W, --output-width=SIZE
     -w, --window-function=FUNCTION
-    -r, --frequency-range=LO,HI,
+    -r, --frequency-range=LO,HI
+    -g, --frequnecy-grid=BASIS,STEP
     -m, --scale-mode=MODE
         --show-params
     -c, --col-steps=SIZE
@@ -66,6 +67,9 @@ options:
 
   <dt>-r, --frequency-range=LO,HI</dt>
   <dd>specify the frequency band show on the output PNG (upper limit to "HI", and lower limit to "LO").<dd>
+
+  <dt>-g, --frequency-grid=BASIS,STEP</dt>
+  <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
 
   <dt>-m, --scale=mode</dt>
   <dd>specify the mode of grid scale in vertical direction of th output PNG. you can specify one of "LOGSCALE" or "LINEARSCALE" (default is "LOGSCALE").</dd>
@@ -104,6 +108,7 @@ options:
     -r, --frequency-range=LO,HI
         --floor-gain=DB
         --ceil-gain=DB
+    -g, --frequnecy-grid=BASIS,STEP
     -m, --scale-mode=STRING
     -c, --col-steps=SIZE
         --show-params
@@ -139,6 +144,10 @@ options:
 
   <dt>--ceil-gain=DB</dt>
   <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked.</dd>
+
+  <dt>-g, --frequency-grid=BASIS,STEP</dt>
+  <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
+
 
   <dt>-m, --scale=mode</dt>
   <dd>specify the mode of grid scale in vertical direction of th output PNG. you can specify one of "LOGSCALE" or "LINEARSCALE" (default is "LOGSCALE").</dd>
@@ -177,9 +186,12 @@ As a sample data, transformed from "Call to Quarters" (https://archive.org/detai
 ```
  wavlet -p cd -F -T -c 2 -v -o Call_To_Quarters-wavelet.png Call_To_Quarters.wav
 ```
-
 ![wavelet result](example/Call_To_Quarters-wavelet.png)
 
+```
+ wavlet -p cd -F -T -c 2 --floor-gain -110 -v -o Call_To_Quarters-wavelet2.png Call_To_Quarters.wav
+```
+![wavelet result](example/Call_To_Quarters-wavelet2.png)
 
 ## Contributing
 
