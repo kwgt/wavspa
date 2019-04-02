@@ -20,7 +20,7 @@ Or install it yourself as:
 
 This application uses OpenMP, but by default tries to link the libgomp. When using another implementation (such as intel OpenMP) with macOS etc, specify the libary path and library name by command line options as follows:
 
-    $ gem insatll wavspa -- --with-openomp ~/env/opts/lib --omp-name omp
+    $ gem insatll wavspa -- --with-openmp ~/env/opts/lib --omp-name omp
 
 ## Usage
 
