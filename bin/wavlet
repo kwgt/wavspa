@@ -151,12 +151,12 @@ OptionParser.new {|opt|
   opt.parse!(ARGV)
 
   if params[:scale_mode] == :LOGSCALE
-    if params[:basis_freq] <= 1.0 || params[:grid_step] <= 1.0
+    if params[:basis_freq]&.<=(1.0) || params[:grid_step]&.<=(1.0)
       error("illeagal frequency grid.")
     end
 
   else
-    if params[:basis_freq] <= 0.0 || params[:grid_step] <= 0.0
+    if params[:basis_freq]&.<=(0.0) || params[:grid_step]&.<=(0.0)
       error("illeagal frequency grid.")
     end
   end

@@ -88,9 +88,8 @@ module WavSpectrumAnalyzer
         end
 
         if wav.channel_num >= 2
-          STDERR.print("error: multi chanel data is not supported " \
-                       "(support only monoral data).\n")
-          exit(1)
+          error("error: multi chanel data is not supported " \
+                "(support only monoral data).")
         end
        
         until rows >= nblk

@@ -79,9 +79,11 @@ module WavSpectrumAnalyzer
       }
     end
 
-    def error(msg)
-      STDERR.printf("error: %s\n")
-      exit(1)
-    end
   end
 end
+
+def error(msg)
+  STDERR.printf("error: %s\n", msg)
+  abort()
+end
+
