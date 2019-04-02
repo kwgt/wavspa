@@ -113,9 +113,9 @@ OptionParser.new {|opt|
     params[:range] = [val[0].to_f, val[1].to_f]
   }
 
-  opt.on("-m", "--scale-mode=MODE", String) { |val|
+  opt.on("-m", "--scale-mode=MODE", String) { |name|
     name = name.upcase.to_sym
-    if not ["LINEAR", "LOGSCALE"].include?(name)
+    if not [:LINEARSCALE, :LOGSCALE].include?(name)
       STDERR.print("error: unknown scale mode.\n")
       exit(1)
     end

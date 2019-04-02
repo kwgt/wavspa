@@ -22,7 +22,7 @@ module WavSpectrumAnalyzer
       frq = @basis_freq / 2
       loop {
         pos  = fpos(frq)
-        break if pos > @output_width
+        break if pos >= @output_width
 
         fb.hline(pos, "#{frq.to_i}Hz")
         frq /= 2
