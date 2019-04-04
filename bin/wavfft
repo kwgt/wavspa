@@ -52,6 +52,10 @@ output = nil
 #
 
 OptionParser.new {|opt|
+  $draw_freq_line = true
+  $draw_time_line = true
+  $verbose        = false
+
   window_funcs = %w{
     RECTANGULAR HAMMING HANN BLACKMAN BLACKMAN_NUTTALL FLAT_TOP
   }
@@ -78,6 +82,10 @@ OptionParser.new {|opt|
     else
       error("unknown preset name.\n")
     end
+  }
+
+  opt.on("-a", "--amplitude-mode", Integer) {|val|
+    params[:transform_mode] = :AMPLITUDE
   }
 
   opt.on("-f", "--fft-size=SIZE", Integer) {|val|
@@ -111,6 +119,14 @@ OptionParser.new {|opt|
     params[:range] = [val[0].to_f, val[1].to_f]
   }
 
+  opt.on("--floor-gain=DB", Float) {|val|
+    params[:floor] = val
+  }
+
+  opt.on("--ceil-gain=DB", Float) {|val|
+    params[:ceil] = val
+  }
+
   opt.on("-g", "--frequency-grid=BASIS,STEP", Array) { |val|
     params[:basis_freq] = val[0].to_f
     params[:grid_step]  = val[1].to_f
@@ -140,12 +156,12 @@ OptionParser.new {|opt|
     exit
   }
 
-  opt.on("-F", "--draw-freq-line") {
-    $draw_freq_line = true
+  opt.on("-F", "--no-draw-freq-line") {
+    $draw_freq_line = false
   }
 
-  opt.on("-T", "--draw-time-line") {
-    $draw_time_line = true
+  opt.on("-T", "--no-draw-time-line") {
+    $draw_time_line = false
   }
 
   opt.on('-v', "--verbose") {

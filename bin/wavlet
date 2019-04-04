@@ -52,6 +52,10 @@ output = nil
 #
 
 OptionParser.new {|opt|
+  $draw_freq_line = true
+  $draw_time_line = true
+  $verbose        = false
+
   opt.banner += " WAV-FILE"
   opt.version = VERSION
 
@@ -77,12 +81,12 @@ OptionParser.new {|opt|
     end
   }
 
-  opt.on("-s", "--sigma=NUMBER", Float) {|val|
-    params[:sigma] = val
-  }
-
   opt.on("-a", "--amplitude-mode", Integer) {|val|
     params[:transform_mode] = :AMPLITUDE
+  }
+
+  opt.on("-s", "--sigma=NUMBER", Float) {|val|
+    params[:sigma] = val
   }
 
   opt.on("-u", "--unit-time=CENTISECOND", Integer) {|val|
@@ -136,12 +140,12 @@ OptionParser.new {|opt|
     exit
   }
 
-  opt.on("-F", "--draw-freq-line") {
-    $draw_freq_line = true
+  opt.on("-F", "--no-draw-freq-line") {
+    $draw_freq_line = false
   }
 
-  opt.on("-T", "--draw-time-line") {
-    $draw_time_line = true
+  opt.on("-T", "--no-draw-time-line") {
+    $draw_time_line = false
   }
 
   opt.on('-v', "--verbose") {

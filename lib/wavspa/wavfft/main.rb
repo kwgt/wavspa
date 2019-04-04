@@ -19,25 +19,28 @@ module WavSpectrumAnalyzer
 
     class << self
       def load_param(param)
-        @unit_time    = param[:unit_time]
-        @fft_size     = param[:fft_size]
-        @output_width = param[:output_width]
-        @win_func     = param[:window_function]
-
-        @freq_range   = param[:range]
-        @scale_mode   = param[:scale_mode]
-        @logscale     = (param[:scale_mode] == :LOGSCALE)
-        @col_step     = param[:col_step]
-
-        @basis_freq   = param[:basis_freq] || 440.0 
-        @grid_step    = param[:grid_step] || ((@logscale)? 2.0: 2000.0)
-
-        @lo_freq      = @freq_range[0]
-        @hi_freq      = @freq_range[1]
-        @freq_width   = (@hi_freq - @lo_freq)
-
-        @log_step     = (@hi_freq / @lo_freq) ** (1.0 / @output_width)
-        @log_base     = Math.log(@log_step)
+        @transform_mode = param[:transform_mode]
+        @unit_time      = param[:unit_time]
+        @fft_size       = param[:fft_size]
+        @output_width   = param[:output_width]
+        @win_func       = param[:window_function]
+                       
+        @freq_range     = param[:range]
+        @ceil           = param[:ceil]
+        @floor          = param[:floor]
+        @col_step       = param[:col_step]
+                       
+        @scale_mode     = param[:scale_mode]
+        @logscale       = (param[:scale_mode] == :LOGSCALE)
+        @basis_freq     = param[:basis_freq] || 440.0 
+        @grid_step      = param[:grid_step] || ((@logscale)? 2.0: 2000.0)
+                       
+        @lo_freq        = @freq_range[0]
+        @hi_freq        = @freq_range[1]
+        @freq_width     = (@hi_freq - @lo_freq)
+                       
+        @log_step       = (@hi_freq / @lo_freq) ** (1.0 / @output_width)
+        @log_base       = Math.log(@log_step)
       end
       private :load_param
 
@@ -52,7 +55,6 @@ module WavSpectrumAnalyzer
         fft.scale_mode = @scale_mode
         fft.frequency  = @freq_range.clone.unshift(wav.sample_rate)
 
-        line  = []
         rows  = 0
         usize = (wav.sample_rate / 100) * @unit_time
         nblk  = (wav.data_size / (wav.sample_size / 8)) / usize
@@ -61,7 +63,9 @@ module WavSpectrumAnalyzer
                                 @output_width,
                                 :column_step => @col_step,
                                 :margin_x => ($draw_freq_line)? 50:0,
-                                :margin_y => ($draw_time_line)? 30:0)
+                                :margin_y => ($draw_time_line)? 30:0,
+                                :ceil => @ceil,
+                                :floor => @floor)
 
         if $verbose
           STDERR.print <<~EOT
@@ -83,6 +87,9 @@ module WavSpectrumAnalyzer
                 height:      #{fb.height}px
                 freq range:  #{@lo_freq} - #{@hi_freq}Hz
                 scale mode:  #{@scale_mode}
+                plot mode :  #{@transform_mode}
+                ceil:        #{@ceil}
+                floor:       #{@floor}
 
           EOT
         end
@@ -97,20 +104,11 @@ module WavSpectrumAnalyzer
 
           fft << wav.read(usize)
 
-          fft.spectrum.unpack("d*").each {|x|
-            begin
-              x = (x * 3.5).round 
-              x = 0 if x < 0 
-              x = 255 if x > 255
-            rescue
-              x = 0
-            end
-
-            line.unshift(x / 3, x, x / 2)
-          }
-
-          fb.put_column(rows, line)
-          line.clear
+          if @transfer_mode == :POWER
+            fb.draw_power(rows, fft.spectrum)
+          else
+            fb.draw_amplitude(rows, fft.amplitude)
+          end
 
           rows += 1
         end

@@ -776,9 +776,15 @@ fft_calc_spectrum(fft_t* fft, double* dst)
   int j;
   double* a;
   double v;
+  double base;
   lc_t* lc;
 
   do {
+    /*
+     * initialize
+     */
+    ret = 0;
+
     /*
      * argument check
      */
@@ -795,20 +801,18 @@ fft_calc_spectrum(fft_t* fft, double* dst)
     /*
      * calc power spectrum
      */
+    //base = (double)fft->used;
+
     for (i = 0, lc = (lc_t*)fft->line; i < fft->width; i++, lc++) {
       v = 0;
 
       for(j = 0, a = fft->a + (lc->pos * 2); j < lc->n; j++, a += 2) {
-        v += (10 * log10((a[0] * a[0]) + (a[1] * a[1])));
+        //v += 10.0 * log10(((a[0] * a[0]) + (a[1] * a[1])) / base);
+        v += 10.0 * log10((a[0] * a[0]) + (a[1] * a[1]));
       }
 
       dst[i] = v / j;
     }
-
-    /*
-     * mark success
-     */
-    ret = 0;
   } while(0);
 
   return ret;

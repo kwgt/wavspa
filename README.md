@@ -32,19 +32,21 @@ wavfft [options] WAV-FILE
 options:
     -o, --output=FILE
     -p, --preset=NAME
+    -a, --amplitude-mode
     -f, --fft-size=SIZE
-    -u, --unit-time=CS
+    -u, --unit-time=MSEC
     -W, --output-width=SIZE
     -w, --window-function=FUNCTION
     -r, --frequency-range=LO,HI
-    -g, --frequnecy-grid=BASIS,STEP
+        --floor-gain=DB
+        --ceil-gain=DB
+    -g, --frequency-grid=BASIS,STEP
     -m, --scale-mode=MODE
-        --show-params
     -c, --col-steps=SIZE
-    -F, --draw-freq-line
-    -T, --draw-time-line
+        --show-params
+    -F, --no-draw-freq-line
+    -T, --no-draw-time-line
     -v, --verbose
-    -h, --help
 ```
 
 #### options
@@ -56,6 +58,10 @@ options:
   <dt>-p, --preset=NAME</dt>
   <dd>specify preset settings. you can specify one of "default", "32k" or "cd".</dd>
 
+  <dt>-a, --amplitude-mode</dt>
+  <dd>When this option is specified, the amplitude spectrum is output (otherwise, the power spectrum is output).</dd>
+
+
   <dt>-f, --fft-size=FFT</dt>
   <dd>specify the FFT size (by number of samples, this value must spcify a power of 2).</dd>
 
@@ -65,8 +71,17 @@ options:
   <dt>-W, --output-width=SIZE</dt>
   <dd>specify the hight of output PNG (by number of pixels).</dd>
 
+  <dt>-w, --window-function=FUNCTION</dt>
+  <dd>specify name of windows function for short time FFT. you can specify one of "RECTANGULAR", "HAMMING", "HANN", "BLACKMAN", "BLACKMAN\_NUTTALL", "FLAT\_TOP". </dd>
+
   <dt>-r, --frequency-range=LO,HI</dt>
   <dd>specify the frequency band show on the output PNG (upper limit to "HI", and lower limit to "LO").<dd>
+
+  <dt>--floor-gain=DB</dt>
+  <dd>specify the upper limit value of the gain to be displayed. values exceeding this number are displayed as saturated. effective only for amplitude mode.</dd>
+
+  <dt>--ceil-gain=DB</dt>
+  <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked. effective only for amplitude mode.</dd>
 
   <dt>-g, --frequency-grid=BASIS,STEP</dt>
   <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
@@ -80,11 +95,11 @@ options:
   <dt>--show-params</dt>
   <dd>show sumarry of settings.</dd>
 
-  <dt>-F, --draw-freq-line</dt>
-  <dd>enable frequency line (vertical grid).</dd>
+  <dt>-F, --no-draw-freq-line</dt>
+  <dd>disable frequency line (vertical grid).</dd>
 
-  <dt>-F, --draw-freq-line</dt>
-  <dd>enable time line (horizontal grid).</dd>
+  <dt>-F, --no-draw-freq-line</dt>
+  <dd>disable time line (horizontal grid).</dd>
 
    <dt>-v, --verbose</dt>
    <dd>enable verbose mode</dd>
@@ -140,10 +155,10 @@ options:
   <dd>specify the frequency band show on the output PNG (upper limit to "HI", and lower limit to "LO").<dd>
 
   <dt>--floor-gain=DB</dt>
-  <dd>specify the upper limit value of the gain to be displayed. values exceeding this number are displayed as saturated.</dd>
+  <dd>specify the upper limit value of the gain to be displayed. values exceeding this number are displayed as saturated. effective only for amplitude mode.</dd>
 
   <dt>--ceil-gain=DB</dt>
-  <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked.</dd>
+  <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked. effective only for amplitude mode.</dd>
 
   <dt>-g, --frequency-grid=BASIS,STEP</dt>
   <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
@@ -176,7 +191,7 @@ As a sample data, transformed from "Call to Quarters" (https://archive.org/detai
 
 ### FFT
 ```
- wavfft -p cd -F -T -v -o Call_To_Quarters-fft.png Call_To_Quarters.wav
+ wavfft -p cd -c 2 -v -o Call_To_Quarters-fft.png Call_To_Quarters.wav
 ```
 
 ![FFT result](example/Call_To_Quarters-fft.png)
@@ -184,12 +199,12 @@ As a sample data, transformed from "Call to Quarters" (https://archive.org/detai
 
 ### Wavelet
 ```
- wavlet -p cd -F -T -c 2 -v -o Call_To_Quarters-wavelet.png Call_To_Quarters.wav
+ wavlet -p cd -c 2 -v -o Call_To_Quarters-wavelet.png Call_To_Quarters.wav
 ```
 ![wavelet result](example/Call_To_Quarters-wavelet.png)
 
 ```
- wavlet -p cd -F -T -c 2 --floor-gain -110 -v -o Call_To_Quarters-wavelet2.png Call_To_Quarters.wav
+ wavlet -p cd -c 2 --floor-gain -110 -v -o Call_To_Quarters-wavelet2.png Call_To_Quarters.wav
 ```
 ![wavelet result](example/Call_To_Quarters-wavelet2.png)
 

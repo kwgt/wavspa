@@ -348,6 +348,8 @@ rb_fft_spectrum(VALUE self)
   rb_fft_t* ptr;
   VALUE ret;
   int err;
+  int i;
+  double* dat;
 
   /*
    * strip object
@@ -361,9 +363,10 @@ rb_fft_spectrum(VALUE self)
   rb_str_set_len(ret, sizeof(double) * ptr->fft->width);
 
   /*
-   * call inverse function
+   * call transform function
    */
-  err = fft_calc_spectrum(ptr->fft, (double*)RSTRING_PTR(ret));
+  dat = RSTRING_PTR(ret);
+  err = fft_calc_spectrum(ptr->fft, dat);
   if (err) {
     RUNTIME_ERROR( "fft_calc_spectrum() failed. [err = %d]\n", err);
   }

@@ -25,6 +25,10 @@ typedef struct {
   int stride;
   int size;
 
+  double ceil;
+  double floor;
+  double range;
+
   VALUE buf;
 } rb_fb_t;
 
@@ -297,6 +301,8 @@ static const char* opts_keys[] = {
   "column_step",
   "margin_x",
   "margin_y",
+  "ceil",
+  "floor",
 };
 
 static ID opts_ids[N(opts_keys)];
@@ -351,6 +357,9 @@ rb_fb_alloc(VALUE self)
   ptr->step     = 1;
   ptr->margin_x = 0;
   ptr->margin_y = 0;
+  ptr->ceil     = -10.0;
+  ptr->floor    = -90.0;
+  ptr->range    = ptr->ceil - ptr->floor;
   ptr->size     = -1;
   ptr->buf      = Qnil;
 
@@ -398,6 +407,12 @@ rb_fb_initialize(int argc, VALUE* argv, VALUE self)
 
     // :margin_y
     if (opts[2] != Qundef) ptr->margin_y = FIX2INT(opts[2]);
+
+    // :ceil
+    if (opts[3] != Qundef) ptr->ceil = NUM2DBL(opts[3]);
+
+    // :floor
+    if (opts[4] != Qundef) ptr->floor = NUM2DBL(opts[4]);
   }
 
   ptr->width  = FIX2INT(width);
@@ -406,6 +421,8 @@ rb_fb_initialize(int argc, VALUE* argv, VALUE self)
   ptr->stride = (ptr->margin_x + (ptr->width * ptr->step)) * 3;
   ptr->size   = ptr->stride * (ptr->height + ptr->margin_y);
   ptr->buf    = rb_str_buf_new(ptr->size);
+
+  ptr->range  = ptr->ceil - ptr->floor;
 
   /*
    * clear buffer
@@ -456,16 +473,15 @@ rb_fb_to_s(VALUE self)
 }
 
 static VALUE
-rb_fb_put_column(VALUE self, VALUE col, VALUE dat)
+rb_fb_draw_power(VALUE self, VALUE col, VALUE dat)
 {
   rb_fb_t* ptr;
   uint8_t* p;
-  uint8_t r;
-  uint8_t g;
-  uint8_t b;
+  uint8_t* src;
+  double x;
+  int v;
   int i;
   int j;
-  int k;
 
   /*
    * extract context data
@@ -476,37 +492,110 @@ rb_fb_put_column(VALUE self, VALUE col, VALUE dat)
    * check argument
    */
   Check_Type(col, T_FIXNUM);
-  Check_Type(dat, T_ARRAY);
+  Check_Type(dat, T_STRING);
 
   if (FIX2INT(col) < 0 || FIX2INT(col) >= ptr->width) {
     ARGUMENT_ERROR("invalid column number");
   }
 
-  if (RARRAY_LEN(dat) != (ptr->height * 3)) {
+  if (RSTRING_LEN(dat) != (int)((sizeof(double) * ptr->height))) {
     ARGUMENT_ERROR("invalid data length");
   }
 
   /*
    * put pixel data
    */
-  p = (uint8_t*)RSTRING_PTR(ptr->buf) +
-            ((ptr->margin_x + (FIX2INT(col) * ptr->step)) * 3);
-  i = 0;
+  p   = (uint8_t*)RSTRING_PTR(ptr->buf) +
+              ((ptr->margin_x + (FIX2INT(col) * ptr->step)) * 3);
+  src = (uint8_t*)RSTRING_PTR(dat) + (sizeof(double) * (ptr->height - 1));
 
-  for (j = 0; j < ptr->height; j++) {
-    r = FIX2ULONG(rb_ary_entry(dat, i++)) & 0xff;
-    g = FIX2ULONG(rb_ary_entry(dat, i++)) & 0xff;
-    b = FIX2ULONG(rb_ary_entry(dat, i++)) & 0xff;
+  for (i = 0; i < ptr->height; i++) {
+    memcpy(&x, src, sizeof(double));
 
-    for (k = 0; k < ptr->step; k++) {
-      p[0] = r;
-      p[1] = g;
-      p[2] = b;
+    v = round(x * 3.5);
+
+    if (v < 0) {
+      v = 0;
+
+    } else if (v > 255.0) {
+      v = 255;
+    }
+
+    for (j = 0; j < ptr->step; j++) {
+      p[0] = v / 3;
+      p[1] = v;
+      p[2] = v / 2;
 
       p += 3;
     }
 
-    p += (ptr->stride - (k * 3));
+    p   += (ptr->stride - (j * 3));
+    src -= sizeof(double);
+  }
+
+  return self;
+}
+
+static VALUE
+rb_fb_draw_amplitude(VALUE self, VALUE col, VALUE dat)
+{
+  rb_fb_t* ptr;
+  uint8_t* p;
+  uint8_t* src;
+  double x;
+  int v;
+  int i;
+  int j;
+
+  /*
+   * extract context data
+   */
+  TypedData_Get_Struct(self, rb_fb_t, &fb_data_type, ptr);
+
+  /*
+   * check argument
+   */
+  Check_Type(col, T_FIXNUM);
+  Check_Type(dat, T_STRING);
+
+  if (FIX2INT(col) < 0 || FIX2INT(col) >= ptr->width) {
+    ARGUMENT_ERROR("invalid column number");
+  }
+
+  if (RSTRING_LEN(dat) != (int)((sizeof(double) * ptr->height))) {
+    ARGUMENT_ERROR("invalid data length");
+  }
+
+  /*
+   * put pixel data
+   */
+  p   = (uint8_t*)RSTRING_PTR(ptr->buf) +
+              ((ptr->margin_x + (FIX2INT(col) * ptr->step)) * 3);
+  src = (uint8_t*)RSTRING_PTR(dat) + (sizeof(double) * (ptr->height - 1));
+
+  for (i = 0; i < ptr->height; i++) {
+    memcpy(&x, src, sizeof(double));
+
+    if (x >= ptr->ceil) {
+      v = 255;
+
+    } else if (x <= ptr->floor) {
+      v = 0;
+
+    } else {
+      v = (uint8_t)((255.0 * (x - ptr->floor)) / ptr->range);
+    }
+
+    for (j = 0; j < ptr->step; j++) {
+      p[0] = v / 3;
+      p[1] = v;
+      p[2] = v / 2;
+
+      p += 3;
+    }
+
+    p   += (ptr->stride - (j * 3));
+    src -= sizeof(double);
   }
 
   return self;
@@ -680,7 +769,8 @@ Init_fb()
   rb_define_method(fb_klass, "width", rb_fb_width, 0);
   rb_define_method(fb_klass, "height", rb_fb_height, 0);
   rb_define_method(fb_klass, "to_s", rb_fb_to_s, 0);
-  rb_define_method(fb_klass, "put_column", rb_fb_put_column, 2);
+  rb_define_method(fb_klass, "draw_power", rb_fb_draw_power, 2);
+  rb_define_method(fb_klass, "draw_amplitude", rb_fb_draw_amplitude, 2);
   rb_define_method(fb_klass, "hline", rb_fb_hline, 2);
   rb_define_method(fb_klass, "vline", rb_fb_vline, 2);
 
