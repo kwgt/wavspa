@@ -32,7 +32,7 @@ module WavSpectrumAnalyzer
         pos  = fpos(frq)
         break if pos >= @output_width
 
-        fb.hline(pos, "#{frq.to_i}Hz")
+        fb.hline(pos, "#{frq.to_i}Hz") if pos >= 0
         frq = down_step(frq)
       }
      
@@ -44,7 +44,7 @@ module WavSpectrumAnalyzer
         pos = fpos(frq)
         break if pos <= 0 
 
-        fb.hline(pos, "#{frq.to_i}Hz")
+        fb.hline(pos, "#{frq.to_i}Hz") if pos < @output_width
         frq = up_step(frq)
       }
     end
