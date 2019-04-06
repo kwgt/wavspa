@@ -610,11 +610,14 @@ put_string(rb_fb_t* ptr, int row, int col,
   uint8_t* p0;
   char* str;
   int len;
+  int w;
+  int h;
 
   uint8_t* p;
   const uint8_t* gl; // as Glyph
   int i;
   int j;
+  int k;
   uint8_t m;
 
   head = (uint8_t*)RSTRING_PTR(ptr->buf);
@@ -622,24 +625,32 @@ put_string(rb_fb_t* ptr, int row, int col,
   p0   = head + ((row * ptr->stride) + (col * 3));
   str  = RSTRING_PTR(rstr);
   len  = RSTRING_LEN(rstr);
+  w    = ptr->width + ptr->margin_x;
+  h    = ptr->height + ptr->margin_y;
 
   for (i = 0; i < len; i++) {
     p  = p0 + (i * 6 * 3);
     gl = font + (str[i] * 10);
 
     for (j = 0; j < 10; j++) {
-      for (m = 0x80; m >= 0x08; m >>= 1) {
-        if ((gl[j] & m) && (p + 0 >= head) && (p + 3 < tail)) {
+      for (k = 0; k < 5; k++) {
+        do {
+          if ((col + k <  0) || (row + j <  0)) break;
+          if ((col + k >= w) || (row + j >= h)) break;
+          if (!(gl[j] & (0x80 >> k))) break;
+
           p[0] = r;
           p[1] = g;
           p[2] = b;
-        }
+        } while (0);
 
         p += 3;
       }
 
       p += (ptr->stride - (5 * 3));
     }
+
+    col += 5;
   }
 }
 
