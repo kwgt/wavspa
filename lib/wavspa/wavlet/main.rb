@@ -22,6 +22,7 @@ module WavSpectrumAnalyzer
         @transform_mode = param[:transform_mode]
         @unit_time      = param[:unit_time]
         @sigma          = param[:sigma]
+        @threshold      = param[:threshold]
         @output_width   = param[:output_width]
                        
         @freq_range     = param[:range]
@@ -49,11 +50,13 @@ module WavSpectrumAnalyzer
         wav = WavFile.open(input)
         wl  = Wavelet.new
 
-        wl.frequency  = wav.sample_rate
-        wl.sigma      = @sigma
-        wl.range      = (@lo_freq .. @hi_freq)
-        wl.scale_mode = @scale_mode
-        wl.width      = @output_width
+        wl.frequency       = wav.sample_rate
+        wl.sigma           = @sigma
+        wl.gabor_threshold = @threshold
+        wl.range           = (@lo_freq .. @hi_freq)
+        wl.scale_mode      = @scale_mode
+        wl.width           = @output_width
+
 
         wl.put_in("s%dle" % wav.sample_size, wav.read)
 
@@ -73,24 +76,25 @@ module WavSpectrumAnalyzer
           STDERR.print <<~EOT
             - input data
               #{input}
-                data size:   #{wav.data_size}
-                channel num: #{wav.channel_num}
-                sample rate: #{wav.sample_rate} Hz
-                sample size: #{wav.sample_size} bits
-                data rate:   #{wav.bytes_per_sec} bytes/sec
+                data size:       #{wav.data_size}
+                channel num:     #{wav.channel_num}
+                sample rate:     #{wav.sample_rate} Hz
+                sample size:     #{wav.sample_size} bits
+                data rate:       #{wav.bytes_per_sec} bytes/sec
 
             - WAVELET parameter
-                sigma:       #{@sigma}
-                unit time:   #{@unit_time} ms
+                sigma:           #{@sigma}
+                gabor threshold: #{@threshold}
+                unit time:       #{@unit_time} ms
 
             - OUTPUT
-                width:       #{fb.width}px
-                height:      #{fb.height}px
-                freq range:  #{@lo_freq} - #{@hi_freq}Hz
-                scale mode:  #{@scale_mode}
-                plot mode :  #{@transform_mode}
-                ceil:        #{@ceil}
-                floor:       #{@floor}
+                width:           #{fb.width}px
+                height:          #{fb.height}px
+                freq range:      #{@lo_freq} - #{@hi_freq}Hz
+                scale mode:      #{@scale_mode}
+                plot mode :      #{@transform_mode}
+                ceil:            #{@ceil}
+                floor:           #{@floor}
 
           EOT
         end

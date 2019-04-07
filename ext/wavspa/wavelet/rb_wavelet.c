@@ -26,6 +26,7 @@ static VALUE wavelet_klass;
 
 static const char* wavelet_opts_keys[] = {
   "sigma",            // {float}
+  "gabor_threshold",  // {float}
   "frequency",        // {float}
   "range",            // {Range}
   "scale_mode",       // {str}
@@ -69,6 +70,19 @@ eval_wavelet_opt_sigma(rb_wavelet_t* ptr, VALUE opt)
     err = walet_set_sigma(ptr->wl, NUM2DBL(opt));
     if (err) {
       RUNTIME_ERROR("walet_set_sigma() failed. [err=%d]", err);
+    }
+  }
+}
+
+static void
+eval_wavelet_opt_gabor_threshold(rb_wavelet_t* ptr, VALUE opt)
+{
+  int err;
+
+  if (opt != Qundef) {
+    err = walet_set_gabor_threshold(ptr->wl, NUM2DBL(opt));
+    if (err) {
+      RUNTIME_ERROR("walet_set_gabor_threshold() failed. [err=%d]", err);
     }
   }
 }
@@ -154,10 +168,11 @@ set_wavelet_context(rb_wavelet_t* ptr, VALUE opt)
    * set context
    */
   eval_wavelet_opt_sigma(ptr, opts[0]);
-  eval_wavelet_opt_frequency(ptr, opts[1]);
-  eval_wavelet_opt_range(ptr, opts[2]);
-  eval_wavelet_opt_scale_mode(ptr, opts[3]);
-  eval_wavelet_opt_output_width(ptr, opts[4]);
+  eval_wavelet_opt_gabor_threshold(ptr, opts[1]);
+  eval_wavelet_opt_frequency(ptr, opts[2]);
+  eval_wavelet_opt_range(ptr, opts[3]);
+  eval_wavelet_opt_scale_mode(ptr, opts[4]);
+  eval_wavelet_opt_output_width(ptr, opts[5]);
 }
 
 static VALUE
@@ -234,6 +249,43 @@ rb_wavelet_set_sigma(VALUE self, VALUE sigma)
   eval_wavelet_opt_sigma(ptr, sigma);
 
   return sigma;
+}
+
+static VALUE
+rb_wavelet_get_gabor_threshold(VALUE self)
+{
+  VALUE ret;
+  rb_wavelet_t* ptr;
+  
+  /*
+   * strip object
+   */
+  Data_Get_Struct(self, rb_wavelet_t, ptr);
+
+  /*
+   * create return paramter
+   */
+  ret = DBL2NUM(ptr->wl->gth);
+
+  return ret;
+}
+
+static VALUE
+rb_wavelet_set_gabor_threshold(VALUE self, VALUE th)
+{
+  rb_wavelet_t* ptr;
+  
+  /*
+   * strip object
+   */
+  Data_Get_Struct(self, rb_wavelet_t, ptr);
+
+  /*
+   * call setter function
+   */
+  eval_wavelet_opt_gabor_threshold(ptr, th);
+
+  return th;
 }
 
 static VALUE
@@ -683,6 +735,10 @@ Init_wavelet()
   rb_define_method(wavelet_klass, "initialize", rb_wavelet_initialize, -1);
   rb_define_method(wavelet_klass, "sigma", rb_wavelet_get_sigma, 0);
   rb_define_method(wavelet_klass, "sigma=", rb_wavelet_set_sigma, 1);
+  rb_define_method(wavelet_klass, "gabor_threshold",
+                                  rb_wavelet_get_gabor_threshold, 0);
+  rb_define_method(wavelet_klass, "gabor_threshold=",
+                                  rb_wavelet_set_gabor_threshold, 1);
   rb_define_method(wavelet_klass, "frequency", rb_wavelet_get_frequency, 0);
   rb_define_method(wavelet_klass, "frequency=", rb_wavelet_set_frequency, 1);
   rb_define_method(wavelet_klass, "range", rb_wavelet_get_range, 0);

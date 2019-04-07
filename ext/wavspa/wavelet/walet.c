@@ -30,14 +30,13 @@
 #define DEFAULT_LOW_FREQ        100.0
 #define DEFAULT_HIGH_FREQ       2000.0
 #define DEFAULT_SIGMA           3.0
+#define DEFAULT_GABOR_THRESHOLD 0.01
 #define DEFAULT_OUTPUT_WIDTH    360
 #define DEFAULT_SCALE_MODE      WALET_LOGSCALE_MODE
-                               
-#define GABOR_THRESHOLD         0.01
 
 #define F_DIRTY                 0x00000001
                 
-#define CALC_WK0(sig)           ((sig) * sqrt(-2.0 * log(GABOR_THRESHOLD)))
+#define CALC_WK0(sig,th)        ((sig) * sqrt(-2.0 * log(th)))
 #define CALC_WK1(sig)           (1.0 / sqrt(M_PI2 * (sig) * (sig)))
 #define CALC_WK2(sig)           (2.0 * (sig) * (sig))
                              
@@ -135,7 +134,8 @@ walet_new(walet_t** _obj)
     obj->fq_l  = DEFAULT_LOW_FREQ;
     obj->fq_h  = DEFAULT_HIGH_FREQ;
     obj->sigma = DEFAULT_SIGMA;
-    obj->wk0   = CALC_WK0(DEFAULT_SIGMA);
+    obj->gth   = DEFAULT_GABOR_THRESHOLD;
+    obj->wk0   = CALC_WK0(DEFAULT_SIGMA, obj->gth);
     obj->wk1   = CALC_WK1(DEFAULT_SIGMA);
     obj->wk2   = CALC_WK2(DEFAULT_SIGMA);
     obj->width = DEFAULT_OUTPUT_WIDTH;
@@ -183,9 +183,39 @@ walet_set_sigma(walet_t* ptr, double sigma)
    */
   if (!ret) {
     ptr->sigma  = sigma;
-    ptr->wk0    = CALC_WK0(sigma);
+    ptr->wk0    = CALC_WK0(sigma, ptr->gth);
     ptr->wk1    = CALC_WK1(sigma);
     ptr->wk2    = CALC_WK2(sigma);
+
+    ptr->flags |= F_DIRTY;
+  }
+
+  return ret;
+}
+
+int
+walet_set_gabor_threshold(walet_t* ptr, double th)
+{
+  int ret;
+
+  /*
+   * initialize
+   */
+  ret = 0;
+
+  /*
+   * argument check
+   */
+  if (ptr == NULL) ret = ERR;
+
+  /*
+   * set parameter
+   */
+  if (!ret) {
+    ptr->gth = th;
+    ptr->wk0 = CALC_WK0(ptr->sigma, th);
+    ptr->wk1 = CALC_WK1(ptr->sigma);
+    ptr->wk2 = CALC_WK2(ptr->sigma);
 
     ptr->flags |= F_DIRTY;
   }
@@ -694,7 +724,6 @@ walet_calc_power(walet_t* ptr, double* dst)
   int ret;
   int i;
   double* wt;
-  double base;
 
   /*
    * initialize
@@ -720,12 +749,12 @@ walet_calc_power(walet_t* ptr, double* dst)
      */
 
 #ifdef _OPENMP
-#pragma omp parallel private(base,wt)
+#pragma omp parallel private(wt)
 #endif /* defined(_OPENMP) */
     for (i = 0; i < ptr->width; i++) {
       wt     = ptr->wt + (i * 2);
-      base   = ptr->ws[i] * 2;
-      dst[i] = 10 * log10(((wt[0] * wt[0]) + (wt[1] * wt[1])) / base);
+      // この辺は表示に合わせて適当に値を見繕ってるので注意
+      dst[i] = 512 * sqrt((wt[0] * wt[0]) + (wt[1] * wt[1]));
     }
   } while (0);
 
