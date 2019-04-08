@@ -769,7 +769,7 @@ fft_transform(fft_t* fft)
 }
 
 int
-fft_calc_spectrum(fft_t* fft, double* dst)
+fft_calc_power(fft_t* fft, double* dst)
 {
   int ret;
   int i;
@@ -805,7 +805,8 @@ fft_calc_spectrum(fft_t* fft, double* dst)
       v = 0;
 
       for(j = 0, a = fft->a + (lc->pos * 2); j < lc->n; j++, a += 2) {
-        v += 10.0 * log10((a[0] * a[0]) + (a[1] * a[1]));
+        //v += 10.0 * log10((a[0] * a[0]) + (a[1] * a[1]));
+        v += sqrt((a[0] * a[0]) + (a[1] * a[1]));
       }
 
       dst[i] = v / j;
@@ -846,7 +847,7 @@ fft_calc_amplitude(fft_t* fft, double* dst)
     }
 
     /*
-     * calc power spectrum
+     * calc amplitude spectrum
      */
     base = (double)fft->used;
 

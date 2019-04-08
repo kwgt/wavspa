@@ -754,7 +754,7 @@ walet_calc_power(walet_t* ptr, double* dst)
     for (i = 0; i < ptr->width; i++) {
       wt     = ptr->wt + (i * 2);
       // この辺は表示に合わせて適当に値を見繕ってるので注意
-      dst[i] = 512 * sqrt((wt[0] * wt[0]) + (wt[1] * wt[1]));
+      dst[i] = 192 * sqrt((wt[0] * wt[0]) + (wt[1] * wt[1]));
     }
   } while (0);
 

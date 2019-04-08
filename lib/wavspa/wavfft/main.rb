@@ -104,8 +104,8 @@ module WavSpectrumAnalyzer
 
           fft << wav.read(usize)
 
-          if @transfer_mode == :POWER
-            fb.draw_power(rows, fft.spectrum)
+          if @transform_mode == :POWER
+            fb.draw_power(rows, fft.power)
           else
             fb.draw_amplitude(rows, fft.amplitude)
           end

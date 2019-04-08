@@ -343,7 +343,7 @@ rb_fft_set_frequency(VALUE self, VALUE freq)
 
 
 static VALUE
-rb_fft_spectrum(VALUE self)
+rb_fft_power(VALUE self)
 {
   rb_fft_t* ptr;
   VALUE ret;
@@ -366,9 +366,9 @@ rb_fft_spectrum(VALUE self)
    * call transform function
    */
   dat = RSTRING_PTR(ret);
-  err = fft_calc_spectrum(ptr->fft, dat);
+  err = fft_calc_power(ptr->fft, dat);
   if (err) {
-    RUNTIME_ERROR( "fft_calc_spectrum() failed. [err = %d]\n", err);
+    RUNTIME_ERROR( "fft_calc_power() failed. [err = %d]\n", err);
   }
 
   return ret;
@@ -455,7 +455,7 @@ Init_fft()
   rb_define_method(fft_klass, "transform", rb_fft_transform, 0);
   rb_define_method(fft_klass, "enqueue", rb_fft_enqueue, 1);
   rb_define_method(fft_klass, "<<", rb_fft_enqueue, 1);
-  rb_define_method(fft_klass, "spectrum", rb_fft_spectrum, 0);
+  rb_define_method(fft_klass, "power", rb_fft_power, 0);
   rb_define_method(fft_klass, "amplitude", rb_fft_amplitude, 0);
   rb_define_method(fft_klass, "absolute", rb_fft_absolute, 0);
 }

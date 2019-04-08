@@ -650,7 +650,7 @@ put_string(rb_fb_t* ptr, int row, int col,
       p += (ptr->stride - (5 * 3));
     }
 
-    col += 5;
+    col += 6;
   }
 }
 
