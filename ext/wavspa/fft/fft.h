@@ -32,12 +32,14 @@ typedef struct {
   int magnify;
 
   void* line;
-  int width;
 
-  int mode;
   double fq_s;  // as "sampline frequency"
   double fq_h;  // as "high-side frequency"
   double fq_l;  // as "low-side frequency"
+
+  int mode;
+  int width;
+  double step;
 
   double* a;
   int* ip;

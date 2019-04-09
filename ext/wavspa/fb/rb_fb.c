@@ -28,6 +28,7 @@ typedef struct {
   double ceil;
   double floor;
   double range;
+  double lumi;
 
   VALUE buf;
 } rb_fb_t;
@@ -303,6 +304,7 @@ static const char* opts_keys[] = {
   "margin_y",
   "ceil",
   "floor",
+  "luminance",
 };
 
 static ID opts_ids[N(opts_keys)];
@@ -360,6 +362,7 @@ rb_fb_alloc(VALUE self)
   ptr->ceil     = -10.0;
   ptr->floor    = -90.0;
   ptr->range    = ptr->ceil - ptr->floor;
+  ptr->lumi     = 3.5;
   ptr->size     = -1;
   ptr->buf      = Qnil;
 
@@ -413,6 +416,9 @@ rb_fb_initialize(int argc, VALUE* argv, VALUE self)
 
     // :floor
     if (opts[4] != Qundef) ptr->floor = NUM2DBL(opts[4]);
+
+    // :numinance
+    if (opts[5] != Qundef) ptr->lumi = NUM2DBL(opts[5]);
   }
 
   ptr->width  = FIX2INT(width);
@@ -512,7 +518,7 @@ rb_fb_draw_power(VALUE self, VALUE col, VALUE dat)
   for (i = 0; i < ptr->height; i++) {
     memcpy(&x, src, sizeof(double));
 
-    v = round(x * 3.5);
+    v = round(x * 1024 * ptr->lumi);
 
     if (v < 0) {
       v = 0;

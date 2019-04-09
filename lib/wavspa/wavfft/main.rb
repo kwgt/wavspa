@@ -28,6 +28,7 @@ module WavSpectrumAnalyzer
         @freq_range     = param[:range]
         @ceil           = param[:ceil]
         @floor          = param[:floor]
+        @luminance      = param[:luminance]
         @col_step       = param[:col_step]
                        
         @scale_mode     = param[:scale_mode]
@@ -65,7 +66,8 @@ module WavSpectrumAnalyzer
                                 :margin_x => ($draw_freq_line)? 50:0,
                                 :margin_y => ($draw_time_line)? 30:0,
                                 :ceil => @ceil,
-                                :floor => @floor)
+                                :floor => @floor,
+                                :luminance => @luminance)
 
         if $verbose
           STDERR.print <<~EOT

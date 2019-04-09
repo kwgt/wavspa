@@ -573,6 +573,8 @@ set_linear_mapping(fft_t* fft)
     head = tail;
     lc++;
   }
+
+  fft->step = step;
 }
 
 static void
@@ -600,6 +602,8 @@ set_log_mapping(fft_t* fft)
     head = tail;
     lc++;
   }
+
+  fft->step = step;
 }
 
 static void
@@ -775,8 +779,9 @@ fft_calc_power(fft_t* fft, double* dst)
   int i;
   int j;
   double* a;
-  double v;
   lc_t* lc;
+  double v;
+  double fq;
 
   do {
     /*
@@ -802,11 +807,16 @@ fft_calc_power(fft_t* fft, double* dst)
      */
 
     for (i = 0, lc = (lc_t*)fft->line; i < fft->width; i++, lc++) {
-      v = 0;
+      v = 0.0;
+
+      if (fft->mode == FFT_LINEARSCALE_MODE) {
+        fq = fft->fq_l + (fft->step * i);
+      } else {
+        fq = fft->fq_l * pow(fft->step, i);
+      } 
 
       for(j = 0, a = fft->a + (lc->pos * 2); j < lc->n; j++, a += 2) {
-        //v += 10.0 * log10((a[0] * a[0]) + (a[1] * a[1]));
-        v += sqrt((a[0] * a[0]) + (a[1] * a[1]));
+        v += (sqrt((a[0] * a[0]) + (a[1] * a[1])) / fq);
       }
 
       dst[i] = v / j;

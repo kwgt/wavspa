@@ -113,6 +113,10 @@ OptionParser.new {|opt|
     params[:ceil] = val
   }
 
+  opt.on("--luminance=NUM", Float) { |val|
+    params[:luminance] = val
+  }
+
   opt.on("-g", "--frequency-grid=BASIS,STEP", Array) { |val|
     params[:basis_freq] = val[0].to_f
     params[:grid_step]  = val[1].to_f

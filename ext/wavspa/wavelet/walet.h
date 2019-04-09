@@ -21,26 +21,27 @@
 typedef struct __walet__ {
   int flags;
 
-  double fq_s;  // as "sampleing frequency"
-  double fq_l;  // as "low side frequency"
-  double fq_h;  // as "high side fequency"
+  double fq_s;    // as "sampleing frequency"
+  double fq_l;    // as "low side frequency"
+  double fq_h;    // as "high side fequency"
 
   double sigma;
-  double gth;   // as "gabor threshold"
+  double gth;     // as "gabor threshold"
   double wk0;
   double wk1;
   double wk2;
-  int* ws;   // as window size list
+  int* ws;        // as window size list
   double** exp;
 
   int width;
   int mode;
   double step;
 
-  double* smpl; // as "sample data"
-  int n;        // as "number of sample size"
+  double* smpl;   // as "sample data"
+  int n;          // as "number of sample size"
 
   double* wt;
+  double* ft;     // as "frequency table"
 } walet_t;
 
 int walet_new(walet_t** ptr);
