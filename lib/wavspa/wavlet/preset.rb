@@ -12,6 +12,7 @@ module WavSpectrumAnalyzer
     PRESET_TABLE = {
       "default" => {
         :sigma           => 24.0,
+        :threshold       => 0.01,
         :unit_time       => 10 * 10,
         :scale_mode      => :LOGSCALE,
         :transform_mode  => :POWER,
@@ -19,11 +20,13 @@ module WavSpectrumAnalyzer
         :range           => [200.0, 8000.0],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
 
       "cd" => {
         :sigma           => 24.0,
+        :threshold       => 0.01,
         :unit_time       => 5 * 10,
         :scale_mode      => :LOGSCALE,
         :transform_mode  => :POWER,
@@ -31,6 +34,7 @@ module WavSpectrumAnalyzer
         :range           => [50.0, 22050.0],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
     }

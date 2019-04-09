@@ -32,12 +32,14 @@ typedef struct {
   int magnify;
 
   void* line;
-  int width;
 
-  int mode;
   double fq_s;  // as "sampline frequency"
   double fq_h;  // as "high-side frequency"
   double fq_l;  // as "low-side frequency"
+
+  int mode;
+  int width;
+  double step;
 
   double* a;
   int* ip;
@@ -55,7 +57,7 @@ int fft_set_frequency(fft_t* fft, double s, double l, double h);
 int fft_shift_in(fft_t* fft, void* data, int n);
 int fft_reset(fft_t* fft);
 int fft_transform(fft_t* fft);
-int fft_calc_spectrum(fft_t* fft, double* dst);
+int fft_calc_power(fft_t* fft, double* dst);
 int fft_calc_amplitude(fft_t* fft, double* dst);
 int fft_calc_absolute(fft_t* fft, double* dst);
 

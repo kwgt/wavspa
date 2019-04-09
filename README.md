@@ -40,6 +40,7 @@ options:
     -r, --frequency-range=LO,HI
         --floor-gain=DB
         --ceil-gain=DB
+        --luminance=NUMBER
     -g, --frequency-grid=BASIS,STEP
     -m, --scale-mode=MODE
     -c, --col-steps=SIZE
@@ -83,6 +84,9 @@ options:
   <dt>--ceil-gain=DB</dt>
   <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked. effective only for amplitude mode.</dd>
 
+  <dt>--luminance=NUMBER</dt>
+  <dd>specify correction value of luminance for pixel drawing (default is 3.5). effective only for power spectrum mode.</dd>
+
   <dt>-g, --frequency-grid=BASIS,STEP</dt>
   <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
 
@@ -123,6 +127,7 @@ options:
     -r, --frequency-range=LO,HI
         --floor-gain=DB
         --ceil-gain=DB
+        --luminance=NUMBER
     -g, --frequnecy-grid=BASIS,STEP
     -m, --scale-mode=STRING
     -c, --col-steps=SIZE
@@ -156,13 +161,14 @@ options:
 
   <dt>--floor-gain=DB</dt>
   <dd>specify the upper limit value of the gain to be displayed. values exceeding this number are displayed as saturated. effective only for amplitude mode.</dd>
-
   <dt>--ceil-gain=DB</dt>
   <dd>specify the lower limit value of the gain to be displayed. values less than this number will be masked. effective only for amplitude mode.</dd>
 
+  <dt>--luminance=NUMBER</dt>
+  <dd>specify correction value of luminance for pixel drawing (default is 3.5). effective only for power spectrum mode.</dd>
+
   <dt>-g, --frequency-grid=BASIS,STEP</dt>
   <dd>specify frequency grid settings. basis frequency to "BASIS" and step value to "STEP".  "STEP" is evaluated as a ratio for neighbor grid when the scale mode is LOGSCALE, and as a difference for neighbor grid when LINEARSCALE.</dd>
-
 
   <dt>-m, --scale=mode</dt>
   <dd>specify the mode of grid scale in vertical direction of th output PNG. you can specify one of "LOGSCALE" or "LINEARSCALE" (default is "LOGSCALE").</dd>
@@ -204,7 +210,7 @@ As a sample data, transformed from "Call to Quarters" (https://archive.org/detai
 ![wavelet result](example/Call_To_Quarters-wavelet.png)
 
 ```
- wavlet -p cd -c 2 --floor-gain -110 -v -o Call_To_Quarters-wavelet2.png Call_To_Quarters.wav
+ wavlet -p cd -c 2 -a --floor-gain -110 -v -o Call_To_Quarters-wavelet2.png Call_To_Quarters.wav
 ```
 ![wavelet result](example/Call_To_Quarters-wavelet2.png)
 

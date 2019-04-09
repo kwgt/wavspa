@@ -89,6 +89,10 @@ OptionParser.new {|opt|
     params[:sigma] = val
   }
 
+  opt.on("-t", "--gabor-threshold=NUMBER", Float) {|val|
+    params[:threshold] = val
+  }
+
   opt.on("-u", "--unit-time=CENTISECOND", Integer) {|val|
     params[:unit_time] = val * 10
   }
@@ -107,6 +111,10 @@ OptionParser.new {|opt|
 
   opt.on("--ceil-gain=DB", Float) {|val|
     params[:ceil] = val
+  }
+
+  opt.on("--luminance=NUM", Float) { |val|
+    params[:luminance] = val
   }
 
   opt.on("-g", "--frequency-grid=BASIS,STEP", Array) { |val|

@@ -20,6 +20,7 @@ module WavSpectrumAnalyzer
         :range           => [200, 8000],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
 
@@ -33,6 +34,7 @@ module WavSpectrumAnalyzer
         :range           => [200, 16000],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
 
@@ -46,6 +48,7 @@ module WavSpectrumAnalyzer
         :range           => [50, 22000],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
 
@@ -59,6 +62,7 @@ module WavSpectrumAnalyzer
         :range           => [200, 32000],
         :ceil            => -10.0,
         :floor           => -90.0,
+        :luminance       => 3.5,
         :col_step        => 1,
       },
     }
