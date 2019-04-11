@@ -22,6 +22,10 @@ This application uses OpenMP, but by default tries to link the libgomp. When usi
 
     $ gem insatll wavspa -- --with-openmp ~/env/opts/lib --omp-name omp
 
+if you not require OpenMP, specify the folowing option:
+
+    $ gem insatll wavspa -- --no-openmp
+
 ## Usage
 
 ### FFT analyzer
@@ -132,8 +136,8 @@ options:
     -m, --scale-mode=STRING
     -c, --col-steps=SIZE
         --show-params
-    -F, --draw-freq-line
-    -T, --draw-time-line
+    -F, --no-draw-freq-line
+    -T, --no-draw-time-line
     -v, --verbose
 ```
 
@@ -179,17 +183,17 @@ options:
   <dt>--show-params</dt>
   <dd>show sumarry of settings.</dd>
 
-  <dt>-F, --draw-freq-line</dt>
-  <dd>enable frequency line (vertical grid).</dd>
+  <dt>-F, --no-draw-freq-line</dt>
+  <dd>disable frequency line (vertical grid).</dd>
 
-  <dt>-F, --draw-freq-line</dt>
-  <dd>enable time line (horizontal grid).</dd>
+  <dt>-F, --no-draw-freq-line</dt>
+  <dd>disable time line (horizontal grid).</dd>
 
-   <dt>-v, --verbose</dt>
-   <dd>enable verbose mode</dd>
+  <dt>-v, --verbose</dt>
+  <dd>enable verbose mode</dd>
 
-   <dt>-h, --help</dt>
-   <dd>show help message</dd>
+  <dt>-h, --help</dt>
+  <dd>show help message</dd>
 </dl>
 
 ## Output example
