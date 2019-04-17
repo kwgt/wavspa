@@ -816,10 +816,10 @@ fft_calc_power(fft_t* fft, double* dst)
       } 
 
       for(j = 0, a = fft->a + (lc->pos * 2); j < lc->n; j++, a += 2) {
-        v += (sqrt((a[0] * a[0]) + (a[1] * a[1])) / fq);
+        v += sqrt((a[0] * a[0]) + (a[1] * a[1]));
       }
 
-      dst[i] = v / j;
+      dst[i] = v / (j * fq);
     }
   } while(0);
 
